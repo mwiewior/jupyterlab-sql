@@ -2,10 +2,18 @@ from sqlalchemy import create_engine, inspect
 from sqlalchemy.pool import StaticPool
 from sqlalchemy.sql import select, table, text
 
+
+
 from .cache import Cache
-from .connection_url import is_sqlite, is_mysql, has_database
+from .connection_url import is_sqlite, is_mysql, has_database, is_presto
 from .serializer import make_row_serializable
 from .models import DatabaseObjects
+
+import os
+import urllib3
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+import subprocess
+
 
 
 class InvalidConnectionUrl(Exception):
@@ -62,6 +70,20 @@ class Executor:
                 connection_url,
                 lambda: self._create_sqlite_engine(connection_url),
             )
+        elif is_presto(connection_url):
+            presto_url = connection_url
+            UID = str(os.getuid())
+            cmd = 'klist |  grep -m 1 -Po "[_a-zA-Z0-9./-]+@[_a-zA-Z0-9.]+$"'
+            ps = subprocess.Popen(cmd,shell=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
+            principal = ps.communicate()[0].decode("utf-8").strip()
+            args = {'protocol': 'https', \
+                'KerberosRemoteServiceName': os.environ['KERBEROS_REMOTES_SERVICE_NAME'], \
+                'KerberosConfigPath':os.environ['KERBEROS_CONFIG_PATH'], \
+                'KerberosPrincipal': principal, \
+                'KerberosCredentialCachePath': f'/tmp/krb5cc_{UID}', \
+                'requests_kwargs': {'verify': False} \
+                }
+            engine = create_engine(presto_url, connect_args=args)
         else:
             engine = create_engine(connection_url)
         return engine
