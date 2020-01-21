@@ -7,7 +7,7 @@ from .cache import Cache
 from .connection_url import is_sqlite, is_presto
 
 import os
-import urllib3
+    import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 import subprocess
 
@@ -51,7 +51,10 @@ class Executor:
                 lambda: self._create_sqlite_engine(connection_url),
             )
         elif is_presto(connection_url):
-            presto_url = connection_url
+            presto_url = os.environ['PRESTO_URL']
+            parsed_conn_string = connection_url.split('/')
+            db = parsed_conn_string[-1]
+            catalog = parsed_conn_string[-2]
             UID = str(os.getuid())
             cmd = 'klist |  grep -m 1 -Po "[_a-zA-Z0-9./-]+@[_a-zA-Z0-9.]+$"'
             ps = subprocess.Popen(cmd,shell=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
@@ -63,7 +66,7 @@ class Executor:
                 'KerberosCredentialCachePath': f'/tmp/krb5cc_{UID}', \
                 'requests_kwargs': {'verify': False} \
                 }
-            engine = create_engine(presto_url, connect_args=args)
+            engine = create_engine(f"{presto_url}/{catalog}/{db}", connect_args=args)
         else:
             engine = create_engine(connection_url)
         return engine

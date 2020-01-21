@@ -184,36 +184,28 @@ class ConnectionInformationHelper extends React.Component<{}> {
     return (
       <details className="jp-RenderedHTMLCommon">
         <summary>Help</summary>
-        <p>
-          Press <code>Enter</code> to connect to the database.
-        </p>
-        <p>
-          The URL must be a database URL. Follow the{' '}
-          <a
-            href="https://docs.sqlalchemy.org/en/13/core/engines.html#database-urls"
-            target="_blank"
-          >
-            SQLAlchemy guide
-          </a>{' '}
-          on URLs. For instance:
-        </p>
+        <p>Fill in a simplified <strong>database</strong> URL and press <code>Enter</code> to connect to the database in your environment. <br/>
+        The URL must be a following format:</p>
+        <p >&lt;protocol&gt;://&lt;catalog&gt;/&lt;schema&gt;</p>
         <ul>
-          <li>
-            <pre>postgres://localhost:5432/postgres</pre>
-          </li>
-          <li>
-            <pre>postgres://username:password@localhost:5432/postgres</pre>
-          </li>
-          <li>
-            <pre>mysql://localhost/employees</pre>
-          </li>
-          <li>
-            <pre>sqlite://</pre>
-          </li>
-          <li>
-            <pre>sqlite:///myfile.db</pre>
-          </li>
+        <li>&lt;protocol&gt; - [required] protocol used to connect to the database (e.g. <strong>presto</strong>)</li>
+        <li>&lt;catalog&gt; - [required] metadata catalog (e.g. <strong>hive</strong>)</li>
+        <li>&lt;schema&gt; - [required] database or schema (e.g. <strong>hdp_sand</strong>)</li>
         </ul>
+        <p >Sample simplified connection URLs:</p>
+        <ul>
+        <li>presto://hive/hdp_ware</li>
+        <li>presto://hive/hdp_sand</li>
+        </ul>
+        <p><strong>Querying database tables</strong><br/>
+        After connecting to the database, in order to query the database table click on the table name in the list or click on <em>Custom SQL query</em> and type in your SQL query.</p>
+        <p>Note:</p>
+        <ul>
+        <li>submit your query by <code>Ctrl + Enter</code></li>
+        <li><strong>no semicolons</strong> (<code>;</code>) are needed at the end of the query</li>
+        <li><strong>only one SQL query</strong> per window is allowed</li>
+        </ul>
+
       </details>
     );
   }

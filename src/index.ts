@@ -55,7 +55,7 @@ function activate(
       const name = <string>(initialWidgetName || uuid.v4());
       const pageName = <PageName>(initialPageName || PageName.Connection);
       const connectionUrl = <string>(
-        (initialConnectionUrl || 'postgres://localhost:5432/postgres')
+        (initialConnectionUrl || 'presto://$catalog/$db')
       );
       const tableName = <string>(initialTableName || '');
       const sqlStatement = <string>(initialSqlStatement || '');
@@ -74,7 +74,7 @@ function activate(
   palette.addItem({ command, category: 'SQL', args: { isPalette: true } });
 
   if (launcher) {
-    launcher.add({ command, category: 'Other' });
+    launcher.add({ command, category: 'PLAY-Analytics' });
   }
 }
 
